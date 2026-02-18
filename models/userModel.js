@@ -11,6 +11,7 @@ const User = db.define('authUser', {
     user: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
     },
 
     email: {

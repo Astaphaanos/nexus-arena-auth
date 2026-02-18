@@ -201,3 +201,7 @@ form p span:hover {
 .password-rules p.invalid {
   color: #ef4444;
 }
+
+.error {
+  color: #ef4444;
+}

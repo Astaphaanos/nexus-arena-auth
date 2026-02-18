@@ -4,7 +4,11 @@
     <p>Escolha seu nome de guerra e entre na arena</p>
 </div>
 
-<form action="/register" method="POST" class="form-control">
+{{#if errors.general}}
+  <p style="color:red">{{errors.general}}</p>
+{{/if}}
+
+<form action="/auth/register" method="POST" class="form-control">
 
   <div>
     <label for="user">Gamertag</label>
@@ -13,8 +17,12 @@
       id="user"
       name="user"
       placeholder="SeuNomeDeGuerra"
+      value="{{user}}"
       required
     />
+    {{#if errors.user}}
+      <span class="error">{{errors.user}}</span>
+    {{/if}}
   </div>
 
   <div>
@@ -24,8 +32,12 @@
       id="email"
       name="email"
       placeholder="jogador@email.com"
+      value="{{email}}"
       required
     />
+    {{#if errors.email}}
+      <span class="error">{{errors.email}}</span>
+    {{/if}}
   </div>
 
   <div class="input-wrapper">
@@ -35,8 +47,12 @@
       id="password"
       name="password"
       minlength="8"
+      value="{{password}}"
       required
     />
+    {{#if errors.password}}
+      <span class="error">{{errors.password}}</span>
+    {{/if}}
     <button type="button" class="toggle-password" data-target="password">
       Mostrar
     </button>
@@ -77,7 +93,7 @@
 
   <p>
     Já tem conta?
-    <a href="/login"><span>Entrar</span></a>
+    <a href="/auth/login"><span>Entrar</span></a>
   </p>
 
 </form>
