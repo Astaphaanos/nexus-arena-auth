@@ -1,5 +1,6 @@
 import User from '../models/userModel.js'
 import bcrypt from 'bcrypt'
+import { generateToken } from '../config/jwt.js'
 
 class AuthController {
     //* Renderizar handlebars de login
@@ -23,11 +24,12 @@ class AuthController {
             const {user, email, password, confirmPassword} = req.body
             console.log(req.body)
 
+            let errors = {}
+
             if(!user || !email || !password || !confirmPassword) {
                 errors.general = 'Preencha todos os campos'
             }
 
-            let errors = {}
 
             // Verificando se as senhas são iguais
             if(password !== confirmPassword) {
@@ -93,6 +95,7 @@ class AuthController {
             let errors = {}
 
             const user = await User.findOne({where: {email}})
+
             if(!user) {
                 errors.email = 'E-mail não encontrado'
             } else {
@@ -104,12 +107,22 @@ class AuthController {
 
 
             if (Object.keys(errors).length > 0) {
-                    return res.render('register', {
+                    return res.render('login', {
                     errors,
                     email,
                 })
             }
 
+            const token = generateToken(user) // gerando o token
+
+            // salva o cookie httpOnly
+            res.cookie("token", token, {
+                httpOnly: true,
+                secure: false, // true em produção com HTTPS
+                maxAge: 3600000 // 1 hora
+            })
+            
+            //redireciona para dashboard
             return res.render('dashboard', {
                 user: user.user
             })
@@ -123,21 +136,8 @@ class AuthController {
     //* Fazendo logout do usuário
     static logout(req,res) {
         try {
-            if (!req.session) {
-                return res.redirect('/auth/login')
-            }
-            req.session.destroy((err) => {
-                if(err) {
-                    console.log('Erro ao fazer logout', err)
-                    return res.redirect('/dashboard')
-                }
-            })
-
-            // limpa cookie da sessão
-            res.clearCookie('connect.sid', {
-                path: '/'
-            }) 
-            res.redirect('/auth/login')
+            res.clearCookie('token')
+            res.redirect('login')
         } catch (error) {
             console.log('Erro ao fazer logout do usuário',error)
             res.status(500).send('Erro ao fazer logout do usuário')
